@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Better Auth requires these exact table structures
+// Do not modify field names or types
+
+model user {
+  id            String   @id
+  email         String   @unique
+  emailVerified Boolean
+  name          String
+  createdAt     DateTime
+  updatedAt     DateTime
+  image         String?
+
+  sessions           session[]
+  accounts           account[]
+  credits            user_credits?
+  creditTransactions credit_transaction[]
+  paymentTokens      payment_token[]
+  sentGifts          gift_send[]
+  giftInventory      gift_inventory[]
+
+  @@map("user")
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime
+  updatedAt  DateTime
+
+  @@map("verification")
+}
+
+// User Credits
+model user_credits {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_credits")
+}
+
+// Credit Transactions
+model credit_transaction {
+  id             String                  @id @default(cuid())
+  userId         String
+  type           TransactionType
+  amount         Int
+  status         CreditTransactionStatus @default(SUCCESSFUL)
+  reason         String?
+  paymentTokenId String?                 @unique
+  createdAt      DateTime                @default(now())
+
+  user         user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentToken payment_token? @relation(fields: [paymentTokenId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("credit_transaction")
+}
+
+enum TransactionType {
+  grant
+  spend
+  refund
+  adjustment
+}
+
+enum CreditTransactionStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+model payment_token {
+  id           String             @id @default(cuid())
+  userId       String
+  status       PaymentTokenStatus
+  gatewayUid   String?
+  gatewayToken String?
+  rawPayload   Json?
+  amountCents  Int
+  currency     String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  user              user                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditTransaction credit_transaction?
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("payment_token")
+}
+
+enum PaymentTokenStatus {
+  CREATED
+  PENDING
+  SUCCESSFUL
+  FAILED
+  DECLINED
+  EXPIRED
+  ERROR
+}
+
+// Gift Catalog
+model gift_catalog {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  name       String
+  imagePath  String
+  priceCoins Int
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sends     gift_send[]
+  inventory gift_inventory[]
+
+  @@map("gift_catalog")
+}
+
+// Gift Sends
+model gift_send {
+  id                    String   @id @default(cuid())
+  senderUserId          String
+  recipientDatingUserId Int
+  giftId                String
+  priceCoins            Int
+  createdAt             DateTime @default(now())
+
+  sender user         @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
+  gift   gift_catalog @relation(fields: [giftId], references: [id], onDelete: Cascade)
+
+  @@index([senderUserId, createdAt(sort: Desc)])
+  @@index([recipientDatingUserId, createdAt(sort: Desc)])
+  @@index([giftId])
+  @@map("gift_send")
+}
+
+// Gift Inventory
+model gift_inventory {
+  id        String   @id @default(cuid())
+  userId    String
+  giftId    String
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gift gift_catalog @relation(fields: [giftId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, giftId])
+  @@index([userId, updatedAt(sort: Desc)])
+  @@index([giftId])
+  @@map("gift_inventory")
+}

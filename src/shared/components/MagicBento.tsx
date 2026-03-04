@@ -570,6 +570,7 @@ const MagicBento: React.FC<BentoProps> = ({
             <style>
                 {`
           .bento-section {
+			width: 100%;
             --glow-x: 50%;
             --glow-y: 50%;
             --glow-intensity: 0;

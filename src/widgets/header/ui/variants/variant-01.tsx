@@ -11,7 +11,15 @@ import {
     navigationMenuTriggerStyle,
 } from '@/shared/ui/navigation-menu'
 import { Button } from '@/shared/ui/button'
-import { ArrowUpRight } from 'lucide-react'
+import {
+    Sheet,
+    SheetTrigger,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetClose,
+} from '@/shared/ui/sheet'
+import { ArrowUpRight, Menu } from 'lucide-react'
 import { navigationData as defaultNavigationData } from '../../lib/header.mock'
 import { Logo } from '@/shared/components/logo/logo'
 import { NavigationData } from '../../model/types'
@@ -28,11 +36,11 @@ export function HeaderVariant01({
     return (
         <header
             className={cn(
-                'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+                'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60',
                 className,
             )}
         >
-            <div className="container relative flex h-16 items-center justify-between px-4 md:px-6 mx-auto">
+            <div className="relative flex h-16 items-center justify-between px-4 md:px-6 mx-auto">
                 <div className="flex items-center gap-6">
                     <Link
                         href={navigationData.logo.href}
@@ -167,20 +175,84 @@ export function HeaderVariant01({
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Button asChild variant="outline" className="px-6">
+                    <Button asChild variant="outline" className="hidden md:inline-flex px-6">
                         <Link href={navigationData.cta.login.href}>
                             {navigationData.cta.login.label}
                         </Link>
                     </Button>
                     <Button
                         asChild
-                        className="rounded-full px-6 bg-foreground text-background hover:bg-foreground/90 flex items-center gap-2"
+                        className="hidden md:inline-flex rounded-full px-6 bg-foreground text-background hover:bg-foreground/90 items-center gap-2"
                     >
                         <Link href={navigationData.cta.primary.href}>
                             {navigationData.cta.primary.label}
                             <ArrowUpRight className="h-4 w-4" />
                         </Link>
                     </Button>
+
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="md:hidden"
+                                aria-label="Open menu"
+                            >
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right">
+                            <SheetHeader>
+                                <SheetTitle>{navigationData.logo.text}</SheetTitle>
+                            </SheetHeader>
+                            <nav className="flex flex-col gap-4 px-4">
+                                <SheetClose asChild>
+                                    <Link
+                                        href="#features"
+                                        className="text-base font-medium text-foreground/80 hover:text-foreground transition-colors"
+                                    >
+                                        Features
+                                    </Link>
+                                </SheetClose>
+                                <SheetClose asChild>
+                                    <Link
+                                        href="#how-it-works"
+                                        className="text-base font-medium text-foreground/80 hover:text-foreground transition-colors"
+                                    >
+                                        How it Works
+                                    </Link>
+                                </SheetClose>
+                                <SheetClose asChild>
+                                    <Link
+                                        href="#testimonials"
+                                        className="text-base font-medium text-foreground/80 hover:text-foreground transition-colors"
+                                    >
+                                        Testimonials
+                                    </Link>
+                                </SheetClose>
+                            </nav>
+                            <div className="flex flex-col gap-3 mt-auto p-4">
+                                <SheetClose asChild>
+                                    <Button asChild variant="outline" className="w-full">
+                                        <Link href={navigationData.cta.login.href}>
+                                            {navigationData.cta.login.label}
+                                        </Link>
+                                    </Button>
+                                </SheetClose>
+                                <SheetClose asChild>
+                                    <Button
+                                        asChild
+                                        className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+                                    >
+                                        <Link href={navigationData.cta.primary.href}>
+                                            {navigationData.cta.primary.label}
+                                            <ArrowUpRight className="h-4 w-4 ml-2" />
+                                        </Link>
+                                    </Button>
+                                </SheetClose>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 </div>
             </div>
         </header>

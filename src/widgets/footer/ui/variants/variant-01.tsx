@@ -29,6 +29,7 @@ const defaultMenuItems: FooterMenuItem[] = [
             { text: 'Terms Of Service', url: '/terms-of-service' },
             { text: 'Privacy Policy', url: '/privacy-policy' },
             { text: 'Return Policy', url: '/return-policy' },
+            { text: 'Cookies Policy', url: '/cookies-policy' },
         ],
     },
 ]

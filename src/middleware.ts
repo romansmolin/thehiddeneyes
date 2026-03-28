@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { auth } from './shared/lib/auth/auth.config'
-import { headers } from 'next/headers'
 
-export async function middleware(request: NextRequest) {
+const PROTECTED_PREFIXES = ['/dashboard', '/wallet', '/gifts', '/profile', '/match', '/chat']
+
+export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    const hasSession = await auth.api.getSession({
-        headers: await headers(),
-    })
+    const hasSession = request.cookies.has('dating_session_id')
 
-    const isProtectedRoute = pathname.startsWith('/dashboard')
+    const isProtectedRoute = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
     const isAuthRoute = pathname.startsWith('/auth')
 
     if (isProtectedRoute && !hasSession) {
@@ -23,8 +21,6 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next()
 }
-
-export const runtime = 'nodejs'
 
 export const config = {
     matcher: ['/((?!_next/static|_next/image|favicon.ico|public|api|gifts-1|gifts-2|gifts-3).*)'],

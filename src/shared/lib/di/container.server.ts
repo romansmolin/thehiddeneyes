@@ -103,7 +103,9 @@ export function initializeContainer(): void {
     container.bind(GetWalletController).toSelf()
 
     // Payment entity bindings
-    container.bind<IPaymentTokenRepository>('IPaymentTokenRepository').to(PrismaPaymentTokenRepository)
+    container
+        .bind<IPaymentTokenRepository>('IPaymentTokenRepository')
+        .to(PrismaPaymentTokenRepository)
     container.bind<PaymentGatewayAdapter>('PaymentGatewayAdapter').to(SecureProcessorAdapter)
     container.bind(CreatePaymentCheckoutUseCase).toSelf()
     container.bind(UpdatePaymentFromReturnUseCase).toSelf()

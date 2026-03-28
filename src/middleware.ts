@@ -1,21 +1,16 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { auth } from './shared/lib/auth/auth.config'
+import { headers } from 'next/headers'
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    // Accept either Better Auth session or dating session cookie
-    const betterAuthToken = request.cookies.get('better-auth.session_token')?.value
-    const datingSessionId = request.cookies.get('dating_session_id')?.value
-    const hasSession = Boolean(betterAuthToken ?? datingSessionId)
+    const hasSession = await auth.api.getSession({
+        headers: await headers(),
+    })
 
-    const isProtectedRoute =
-        pathname.startsWith('/dashboard') ||
-        pathname.startsWith('/wallet') ||
-        pathname.startsWith('/match') ||
-        pathname.startsWith('/chat') ||
-        pathname.startsWith('/profile') ||
-        pathname.startsWith('/gifts')
+    const isProtectedRoute = pathname.startsWith('/dashboard')
     const isAuthRoute = pathname.startsWith('/auth')
 
     if (isProtectedRoute && !hasSession) {
@@ -28,6 +23,8 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next()
 }
+
+export const runtime = 'nodejs'
 
 export const config = {
     matcher: ['/((?!_next/static|_next/image|favicon.ico|public|api|gifts-1|gifts-2|gifts-3).*)'],

@@ -6,6 +6,7 @@ export interface BentoCardProps {
     title?: string
     description?: string
     label?: string
+    image?: string
     textAutoHide?: boolean
     disableAnimations?: boolean
 }
@@ -47,12 +48,14 @@ const cardData: BentoCardProps[] = [
         title: 'Private Messaging',
         description: 'Meaningful conversations',
         label: 'Chat',
+        image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80&fit=crop',
     },
     {
         color: '#91185C',
         title: 'Date Planning',
         description: 'Plan your perfect date',
         label: 'Dates',
+        image: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800&q=80&fit=crop',
     },
     {
         color: '#91185C',
@@ -548,6 +551,16 @@ const useMobileDetection = () => {
     return isMobile
 }
 
+const FloatingHearts: React.FC = () => (
+    <div className="floating-hearts">
+        {Array.from({ length: 6 }, (_, i) => (
+            <span key={i} className="floating-heart">
+                ♥
+            </span>
+        ))}
+    </div>
+)
+
 const MagicBento: React.FC<BentoProps> = ({
     textAutoHide = true,
     enableStars = true,
@@ -658,6 +671,46 @@ const MagicBento: React.FC<BentoProps> = ({
             z-index: -1;
           }
           
+          .floating-hearts {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+          }
+
+          .floating-heart {
+            position: absolute;
+            opacity: 0;
+            animation: floatHeart 6s ease-in-out infinite;
+            color: rgba(255, 255, 255, 0.15);
+            filter: drop-shadow(0 0 4px rgba(230, 6, 122, 0.3));
+          }
+
+          .floating-heart:nth-child(1) { left: 10%; bottom: -20%; animation-delay: 0s; font-size: 28px; }
+          .floating-heart:nth-child(2) { left: 30%; bottom: -20%; animation-delay: 1.2s; font-size: 22px; }
+          .floating-heart:nth-child(3) { left: 55%; bottom: -20%; animation-delay: 2.5s; font-size: 32px; }
+          .floating-heart:nth-child(4) { left: 75%; bottom: -20%; animation-delay: 3.8s; font-size: 20px; }
+          .floating-heart:nth-child(5) { left: 45%; bottom: -20%; animation-delay: 4.5s; font-size: 26px; }
+          .floating-heart:nth-child(6) { left: 85%; bottom: -20%; animation-delay: 5.2s; font-size: 24px; }
+
+          @keyframes floatHeart {
+            0% {
+              transform: translateY(0) rotate(0deg) scale(0.5);
+              opacity: 0;
+            }
+            10% {
+              opacity: 0.7;
+            }
+            50% {
+              opacity: 0.4;
+            }
+            100% {
+              transform: translateY(-350px) rotate(25deg) scale(1);
+              opacity: 0;
+            }
+          }
+
           .particle-container:hover {
             box-shadow: 0 4px 20px rgba(46, 24, 78, 0.2), 0 0 30px rgba(${glowColor}, 0.2);
           }
@@ -721,6 +774,13 @@ const MagicBento: React.FC<BentoProps> = ({
                             '--glow-y': '50%',
                             '--glow-intensity': '0',
                             '--glow-radius': '200px',
+                            ...(card.image
+                                ? {
+                                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%), url(${card.image})`,
+                                      backgroundSize: 'cover',
+                                      backgroundPosition: 'center',
+                                  }
+                                : {}),
                         } as React.CSSProperties
 
                         if (enableStars) {
@@ -736,10 +796,11 @@ const MagicBento: React.FC<BentoProps> = ({
                                     clickEffect={clickEffect}
                                     enableMagnetism={enableMagnetism}
                                 >
-                                    <div className="card__header flex justify-between gap-3 relative text-white">
+                                    {!card.image && <FloatingHearts />}
+                                    <div className="card__header flex justify-between gap-3 relative text-white z-[2]">
                                         <span className="card__label text-base">{card.label}</span>
                                     </div>
-                                    <div className="card__content flex flex-col relative text-white">
+                                    <div className="card__content flex flex-col relative text-white z-[2]">
                                         <h3
                                             className={`card__title font-normal text-base m-0 mb-1 ${
                                                 textAutoHide ? 'text-clamp-1' : ''
@@ -874,10 +935,11 @@ const MagicBento: React.FC<BentoProps> = ({
                                     el.addEventListener('click', handleClick)
                                 }}
                             >
-                                <div className="card__header flex justify-between gap-3 relative text-white">
+                                {!card.image && <FloatingHearts />}
+                                <div className="card__header flex justify-between gap-3 relative text-white z-[2]">
                                     <span className="card__label text-base">{card.label}</span>
                                 </div>
-                                <div className="card__content flex flex-col relative text-white">
+                                <div className="card__content flex flex-col relative text-white z-[2]">
                                     <h3
                                         className={`card__title font-normal text-base m-0 mb-1 ${
                                             textAutoHide ? 'text-clamp-1' : ''

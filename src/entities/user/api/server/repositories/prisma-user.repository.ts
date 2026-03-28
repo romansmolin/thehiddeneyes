@@ -29,9 +29,7 @@ export class PrismaUserRepository implements IUserRepository {
     async findByGoogleId(googleId: string): Promise<User | null> {
         // Better Auth stores OAuth info in the account table
         // This method is kept for backward compatibility but may not be used
-        throw new Error(
-            'findByGoogleId is deprecated. Use Better Auth session to get user info.',
-        )
+        throw new Error('findByGoogleId is deprecated. Use Better Auth session to get user info.')
     }
 
     async create(input: CreateUserInput): Promise<User> {

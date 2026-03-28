@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'photos.fotochat.com',
+                hostname: 'media.api-sports.io',
             },
         ],
     },

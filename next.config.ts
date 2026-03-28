@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     serverExternalPackages: ['reflect-metadata'],
     images: {
         remotePatterns: [
+            { protocol: 'https', hostname: 'photos.fotochat.com' },
             {
                 protocol: 'https',
                 hostname: 'images.unsplash.com',

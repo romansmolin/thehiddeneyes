@@ -59,7 +59,7 @@ const parseOptionalInteger = (value: string): number | undefined => {
 }
 
 const toFieldValue = (value?: string | number): string => {
-    if (value === undefined) return ''
+    if (value === undefined || value === 0) return ''
     return String(value)
 }
 
